@@ -1,26 +1,29 @@
 using HorizonSideRobots
-function cross!(robot)
-    for side in (Nord, West, Sud, Ost)
-        n = numsteps_putmarkers!(robot,side)
-        along!(robot, inverse(side), n)
-    end
-    putmarker!(robot)
-end
 
-function numsteps_putmarkers!(robot,side)
-    num_steps=0
-    while !isborder(robot,side)
-        move!(robot,side)
-        num_steps += 1
-        putmarker!(robot)
-    end
-    return num_steps
-end
+r=Robot(15, 15; animate = true)
 
-function along!(robot, side, num_steps)
-    for _i in 1:num_steps
-        move!(robot,side)
+function mark_kross(r::Robot) 
+    for side in (HorizonSide(k) for k = 0:3)
+        putmarkers!(r, side)
+        move_by_markers(r, inverse(side))
+    end
+    putmarker!(r)
+end
+putmarkers!(r::Robot, side::HorizonSide) = 
+while isborder(r, side) == false 
+    move!(r, side)
+    putmarker!(r)
+end
+move_by_markers(r::Robot, side::HorizonSide) = 
+while ismarker(r) == true 
+    move!(r, side) 
+end
+inverse(side::HorizonSide) = HorizonSide(mod(Int(side) + 2, 4)) 
+function gocentre(r::Robot)
+    for i in (1:7)
+    move!(r, HorizonSide(3))
+    move!(r, HorizonSide(0))
     end
 end
-
-inverse(side::HorizonSide) = HorizonSide((Int(side) +2)% 4)
+gocentre(r)
+mark_kross(r)
